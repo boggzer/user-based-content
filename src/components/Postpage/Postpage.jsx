@@ -14,19 +14,35 @@ class Postpage extends Component {
             file: "",
             fileName: "",
             fileURL: "",
-            redirect: false
+            redirect: false,
+            isLoading: true,
+            userId: undefined
         }
 
+        this.abortController = new AbortController()
         this.handleChange = this.handleChange.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this)
         this.formRef = React.createRef()
     }
 
+    componentWillUnmount() {
+        this.abortController.abort()
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextState.userId === "" || this.state.userId !== "" || nextState.redirect === false) {
+            return false
+        } else { return true }
+    }
+
     render() {
+        const { isLoading } = this.state
+        console.log(this.state.redirect)
         return (
             // Get current user online
             <UserConsumer>
                 {(userState) => (
+        
                     <>
                         <SignIn />
                         <div className="editPostContainer">
@@ -54,7 +70,7 @@ class Postpage extends Component {
                                 <button type="submit" id="delete_post" value="Delete" onClick={this.handleSubmit}>Ta bort inlägg</button>
                                 <button type="submit" id="new_post" value="Post" name={userState.userId} onClick={this.handleSubmit}>
                                     Posta inlägg
-                                    {this.state.redirect && <Redirect to="/" />}
+                                    {this.state.redirect === true ? <Redirect to="/" /> : null}
                                 </button>
                             </form>
                         </div>
@@ -93,6 +109,7 @@ class Postpage extends Component {
      */
     handleSubmit(event) {
         event.preventDefault()
+        console.log("gello")
         const user = event.target.name
         if (event.target.value === 'Post') {
             const { file, title, text } = this.state
@@ -121,8 +138,7 @@ class Postpage extends Component {
             }).then(res => {
                 // Set state with fileName and then redirect
                 this.setState({ fileName: this.state.file.name, redirect: true })
-                return
-            }).catch(error => console.log(error))
+            }).then(res => window.location.pathname = "/").catch(error => console.log(error))
         } else if (event.target.value === 'Delete') {
             console.log("Delete")
             // Ta bort från databasen...

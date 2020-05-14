@@ -5,12 +5,13 @@ const mongoose = require('mongoose')
 exports.removePost = async (req, res, db) => {
     try {
         const imageRemoved = await Post.findOne({ '_id': req.params.id })
-        if (imageRemoved.image._id !== undefined) {
+        if (imageRemoved.image._id !== undefined && imageRemoved.image._id !== null) {
             const removeFile = await db.collection('images.files',).deleteOne({ '_id': mongoose.Types.ObjectId(imageRemoved.image._id) })
             const removeChunks = await db.collection('images.chunks').deleteOne({ 'files_id': mongoose.Types.ObjectId(imageRemoved.image._id) })
             if (removeChunks.deletedCount === 0 && removeFile.deletedCount === 0) {
                 console.log('No image was found');
-            }
+                return res.status(500).send({ success: true, message: "No image was found"})
+            } else { console.log("Successfully removed image") }
         }
         const removed = await Post.deleteOne({ '_id': req.params.id }, (error, result) => {
             if (error || result.n === 0) {

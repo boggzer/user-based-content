@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import './userpostspage.css'
 import Post from '../Post/Post'
 import { Redirect } from 'react-router-dom'
+import { UserConsumer } from '../../contexts/UserContext'
 
 class UserPostspage extends Component {
     constructor(props) {
@@ -13,11 +14,14 @@ class UserPostspage extends Component {
             userId: this.props.user.userId,
             backToStartpage: false
         }
+
+        this.abortController = new AbortController()
     }
 
     async fetchPosts() {
         await fetch(`http://localhost:3001/api/post/${this.props.user.userId}`, {
-            method: "GET"
+            method: "GET",
+            signal: this.abortController.signal
         }).then(response => response.json())
             .then((json) => {
                 this.setState({
@@ -28,10 +32,14 @@ class UserPostspage extends Component {
             }).catch(error => console.log(error))
     }
 
-    componentWillUpdate(nextProps, nextState) {
-        if (nextState.postsJSON === this.state.postsJSON) {
+    shouldComponentUpdate(nextProps, nextState) {
+        if (this.state.postsJSON === []) {
             return false
         } else { return true }
+    }
+
+    componentWillUnmount() {
+        this.abortController.abort()
     }
 
     /**
@@ -45,9 +53,9 @@ class UserPostspage extends Component {
     render() {
         this.state.isLoading === true && this.props.user.userId !== "" && this.fetchPosts()
         const { isLoading, backToStartpage, postsElements, userId } = this.state
-        console.log(this.state)
+    
         return (
-            isLoading && !backToStartpage ? <p>Loading...</p>
+            isLoading && !this.state.backToStartPage && this.props.userId === "" ? <p>Loading...</p>
                 : <div className="userPostsContainer">
                     {!isLoading && backToStartpage && <><p>Loading...</p><Redirect to="/" /></>}
                     <button type="button" onClick={() => this.setState({ backToStartpage: true })}>Tillbaka till startsidan</button>
