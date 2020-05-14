@@ -12,7 +12,7 @@ export class UserProvider extends Component {
 
         this.state = {
             isLoading: false,
-            userId: 'TETSNAMNENEA',
+            userId: '',
         }
 
     }
