@@ -20,7 +20,6 @@ class UserPostspage extends Component {
             method: "GET"
         }).then(response => response.json())
             .then((json) => {
-                console.log(json)
                 this.setState({
                     isLoading: false,
                     postsJSON: json.allUserPosts,

@@ -12,7 +12,6 @@ class Post extends React.Component {
   }
 
   removePost() {
-    console.log(this.props.data)
     fetch(`http://localhost:3001/api/post/remove/${this.props.data._id}`, {
        method: "DELETE"
      }).then(res => res.json())
