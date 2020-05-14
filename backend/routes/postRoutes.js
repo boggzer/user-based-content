@@ -1,6 +1,6 @@
 const cors = require("cors")
 
-module.exports = (app, gfs, upload) => {
+module.exports = (app, gfs, upload, db) => {
     const controller = require('../controller/postController')
 
     app.use(cors())
@@ -10,6 +10,8 @@ module.exports = (app, gfs, upload) => {
 
     // Get all saved posts
     app.get("/api/post/all", controller.getAllPosts)
+
+    app.delete("/api/post/remove/:id", (req, res) => controller.removePost(req, res, db))
 
     // Get post by id
     app.get("/api/post/:id", controller.getUserPosts)

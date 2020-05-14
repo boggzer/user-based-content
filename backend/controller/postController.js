@@ -1,4 +1,29 @@
 const Post = require('../models/Post')
+const mongoose = require('mongoose')
+
+// Remove post from database
+exports.removePost = async (req, res, db) => {
+    try {
+        const imageRemoved = await Post.findOne({ '_id': req.params.id })
+        if (imageRemoved.image._id !== undefined) {
+            const removeFile = await db.collection('images.files',).deleteOne({ '_id': mongoose.Types.ObjectId(imageRemoved.image._id) })
+            const removeChunks = await db.collection('images.chunks').deleteOne({ 'files_id': mongoose.Types.ObjectId(imageRemoved.image._id) })
+            if (removeChunks.deletedCount === 0 && removeFile.deletedCount === 0) {
+                console.log('No image was found');
+            }
+        }
+        const removed = await Post.deleteOne({ '_id': req.params.id }, (error, result) => {
+            if (error || result.n === 0) {
+                console.log(error)
+                return { success: false, message: "Error while deleting post"}
+            } else { return { result: result, success: true, message: "Successfully deleted post" } }
+        })
+        res.send(removed)
+    } catch (error) {
+        console.log(error)
+        res.status(500).send()
+    }
+}
 
 // Create new post
 exports.createPost = async (req, res) => {
