@@ -18,16 +18,21 @@ class UserPostspage extends Component {
     async fetchPosts() {
         await fetch(`http://localhost:3001/api/post/${this.props.user.userId}`, {
             method: "GET"
-        })
-            .then(response => response.json())
+        }).then(response => response.json())
             .then((json) => {
+                console.log(json)
                 this.setState({
                     isLoading: false,
                     postsJSON: json.allUserPosts,
                     postsElements: this.renderPosts(json.allUserPosts)
                 })
             }).catch(error => console.log(error))
+    }
 
+    componentWillUpdate(nextProps, nextState) {
+        if (nextState.postsJSON === this.state.postsJSON) {
+            return false
+        } else { return true }
     }
 
     /**
@@ -38,16 +43,10 @@ class UserPostspage extends Component {
         return allPosts
     }
 
-    /**
-     * Fetch posts when component mounts, will trigger rerender
-     */
-    componentDidMount() {
-        this.fetchPosts()
-    }
-
     render() {
+        this.state.isLoading === true && this.props.user.userId !== "" && this.fetchPosts()
         const { isLoading, backToStartpage, postsElements, userId } = this.state
-
+        console.log(this.state)
         return (
             isLoading && !backToStartpage ? <p>Loading...</p>
                 : <div className="userPostsContainer">
