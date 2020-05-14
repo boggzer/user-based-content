@@ -239,11 +239,11 @@ export default class SignIn extends Component {
 		return (
 			<div className='profileSidebar'>
 				<h3>Hej {signInUsername}! </h3>
-				<button type='button' onClick={() => { this.setState({ userPosts: true }); console.log(this.state.userPosts, "click") }}>
+				<button type='button' onClick={() => { this.setState({ userPosts: true }) }}>
 					Your Posts
 					{this.state.userPosts && <Redirect to="/post" />}
 				</button>
-				<button type='button' onClick={() => { this.setState({ createPost: true }); console.log(this.state.createPost, "click") }}>
+				<button type='button' onClick={() => { this.setState({ createPost: true }) }}>
 					Create New Post
 					{this.state.createPost && <Redirect to="/new" />}
 				</button>
